@@ -11,7 +11,6 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -80,15 +79,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Lovable App" },
-      { name: "description", content: "Research Journal Pro is a detailed scientific journal application for organizing and tracking research data." },
+      { name: "description", content: "Research Journal — a detailed scientific journal for organizing and tracking your research data." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Research Journal Pro is a detailed scientific journal application for organizing and tracking research data." },
+      { property: "og:title", content: "Research Journal" },
+      { property: "og:description", content: "A detailed scientific journal for organizing and tracking your research data." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Lovable App" },
-      { name: "twitter:description", content: "Research Journal Pro is a detailed scientific journal application for organizing and tracking research data." },
+      { name: "twitter:title", content: "Research Journal" },
+      { name: "twitter:description", content: "A detailed scientific journal for organizing and tracking your research data." },
       { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9f313811-c4a8-40cc-ab4d-b678aa458d2f/id-preview-796bbe05--35bc4a7c-c9da-4dbf-abf8-87921dfbcb7b.lovable.app-1781494587387.png" },
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/9f313811-c4a8-40cc-ab4d-b678aa458d2f/id-preview-796bbe05--35bc4a7c-c9da-4dbf-abf8-87921dfbcb7b.lovable.app-1781494587387.png" },
     ],
@@ -121,16 +120,6 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const router = useRouter();
-
-  useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
-      router.invalidate();
-      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
-    });
-    return () => sub.subscription.unsubscribe();
-  }, [router, queryClient]);
 
   return (
     <QueryClientProvider client={queryClient}>
