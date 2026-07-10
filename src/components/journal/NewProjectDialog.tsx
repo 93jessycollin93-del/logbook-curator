@@ -7,8 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
-import { PROJECT_COLORS } from "@/lib/journal";
+import { PROJECT_COLORS, createProject } from "@/lib/journal";
 import { toast } from "sonner";
 
 const schema = z.object({
@@ -43,10 +42,7 @@ export function NewProjectDialog({ open, onOpenChange }: { open: boolean; onOpen
   const mut = useMutation({
     mutationFn: async () => {
       const parsed = schema.parse({ name, category, description, phase, status, color, progress });
-      const { data: userRes } = await supabase.auth.getUser();
-      if (!userRes.user) throw new Error("Not signed in");
-      const { error, data } = await supabase.from("projects").insert({
-        user_id: userRes.user.id,
+      return createProject({
         name: parsed.name,
         category: parsed.category,
         description: parsed.description || null,
@@ -54,9 +50,7 @@ export function NewProjectDialog({ open, onOpenChange }: { open: boolean; onOpen
         status: parsed.status,
         color: parsed.color,
         progress: parsed.progress,
-      }).select().single();
-      if (error) throw error;
-      return data;
+      });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["projects"] });
@@ -78,12 +72,7 @@ export function NewProjectDialog({ open, onOpenChange }: { open: boolean; onOpen
         <div className="space-y-4">
           <div className="space-y-1.5">
             <Label className="text-xs font-mono uppercase tracking-wider">Name</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Molecular synthesis" />
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs font-mono uppercase tracking-wider">Description</Label>
-            <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2}
-              placeholder="Tracking polymer chain reactions in cryogenic vacuum" />
+            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Protein folding kinetics" />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
@@ -108,30 +97,31 @@ export function NewProjectDialog({ open, onOpenChange }: { open: boolean; onOpen
               </Select>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label className="text-xs font-mono uppercase tracking-wider">Phase</Label>
-              <Input value={phase} onChange={(e) => setPhase(e.target.value)} placeholder="PHASE-02" />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs font-mono uppercase tracking-wider">Progress %</Label>
-              <Input type="number" min={0} max={100} value={progress}
-                onChange={(e) => setProgress(Math.max(0, Math.min(100, Number(e.target.value) || 0)))} />
-            </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-mono uppercase tracking-wider">Phase</Label>
+            <Input value={phase} onChange={(e) => setPhase(e.target.value)} placeholder="PHASE-01" />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
+            <Label className="text-xs font-mono uppercase tracking-wider">Description</Label>
+            <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} placeholder="Goal, scope, key questions…" />
+          </div>
+          <div className="space-y-1.5">
             <Label className="text-xs font-mono uppercase tracking-wider">Color</Label>
             <div className="flex gap-2">
               {PROJECT_COLORS.map((c) => (
                 <button key={c.id} type="button" onClick={() => setColor(c.id)}
-                  className={`size-8 rounded-lg ${c.swatch} transition-all ${color === c.id ? "ring-2 ring-offset-2 ring-foreground" : "opacity-60 hover:opacity-100"}`}
+                  className={`size-8 rounded-lg ${c.swatch} ${color === c.id ? "ring-2 ring-foreground ring-offset-2 ring-offset-background" : ""}`}
                   aria-label={c.id} />
               ))}
             </div>
           </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-mono uppercase tracking-wider">Progress ({progress}%)</Label>
+            <input type="range" min={0} max={100} step={5} value={progress} onChange={(e) => setProgress(Number(e.target.value))} className="w-full" />
+          </div>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
           <Button onClick={() => mut.mutate()} disabled={mut.isPending}>{mut.isPending ? "Saving…" : "Create project"}</Button>
         </DialogFooter>
       </DialogContent>

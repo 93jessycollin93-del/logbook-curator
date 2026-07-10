@@ -7,7 +7,7 @@ import { BottomNav } from "@/components/journal/BottomNav";
 import { NewEntryDialog } from "@/components/journal/NewEntryDialog";
 import { fetchEntries, STATUS_LABELS } from "@/lib/journal";
 
-export const Route = createFileRoute("/_authenticated/archive")({
+export const Route = createFileRoute("/archive")({
   head: () => ({ meta: [{ title: "Archive — Hypothesis.Log" }] }),
   component: Archive,
 });

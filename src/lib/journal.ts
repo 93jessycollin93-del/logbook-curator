@@ -10,12 +10,16 @@
 const JACKY_URL = (import.meta as any).env?.VITE_JACKY_URL || null;
 
 export type Project = {
-  id: string; name: string; description: string | null; status: string;
+  id: string; name: string; description: string | null;
+  category: string; status: string; phase: string | null; progress: number;
   color: string; created_at: string; updated_at: string; user_id: string;
 };
 export type Entry = {
-  id: string; project_id: string | null; title: string; content: string | null;
-  entry_date: string; status: string; measurements: any; tags: string[] | null;
+  id: string; project_id: string | null; title: string;
+  entry_date: string; status: string;
+  hypothesis: string | null; methods: string | null;
+  results: string | null; conclusion: string | null;
+  measurements: Measurement[]; tags: string[];
   created_at: string; updated_at: string; user_id: string;
 };
 export type Measurement = { label: string; value: string; unit?: string };
@@ -93,7 +97,11 @@ export async function fetchProject(id: string): Promise<Project | null> {
 export async function createProject(data: Partial<Project>): Promise<Project> {
   const project: Project = {
     id: uid(), name: data.name || "New Project",
-    description: data.description || null, status: data.status || "active",
+    description: data.description ?? null,
+    category: data.category || "General",
+    status: data.status || "active",
+    phase: data.phase ?? null,
+    progress: data.progress ?? 0,
     color: data.color || "blue", created_at: now(), updated_at: now(), user_id: "local",
   };
   const projects = loadProjects();
@@ -122,9 +130,14 @@ export async function deleteProject(id: string): Promise<void> {
 export async function createEntry(data: Partial<Entry>): Promise<Entry> {
   const entry: Entry = {
     id: uid(), project_id: data.project_id || null,
-    title: data.title || "New Entry", content: data.content || null,
+    title: data.title || "New Entry",
     entry_date: data.entry_date || now().split("T")[0],
-    status: data.status || "routine", measurements: data.measurements || [],
+    status: data.status || "routine",
+    hypothesis: data.hypothesis ?? null,
+    methods: data.methods ?? null,
+    results: data.results ?? null,
+    conclusion: data.conclusion ?? null,
+    measurements: data.measurements || [],
     tags: data.tags || [], created_at: now(), updated_at: now(), user_id: "local",
   };
   const entries = loadEntries();
