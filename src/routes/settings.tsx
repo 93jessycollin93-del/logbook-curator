@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/_authenticated/settings")({
+export const Route = createFileRoute("/settings")({
   head: () => ({ meta: [{ title: "Settings — Hypothesis.Log" }] }),
   component: Settings,
 });

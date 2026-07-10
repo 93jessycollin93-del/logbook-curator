@@ -8,7 +8,7 @@ import { NewEntryDialog } from "@/components/journal/NewEntryDialog";
 import { NewProjectDialog } from "@/components/journal/NewProjectDialog";
 import { fetchProjects, fetchEntries, colorClasses, STATUS_LABELS, PROJECT_STATUS_LABELS } from "@/lib/journal";
 
-export const Route = createFileRoute("/_authenticated/dashboard")({
+export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
       { title: "Dashboard — Hypothesis.Log" },
