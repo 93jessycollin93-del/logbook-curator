@@ -60,13 +60,11 @@ export function NewEntryDialog({
         title: parsed.title,
         project_id: parsed.project_id,
         status: parsed.status,
-        content: [
-          parsed.hypothesis ? `Hypothesis: ${parsed.hypothesis}` : "",
-          parsed.methods ? `Methods: ${parsed.methods}` : "",
-        ].filter(Boolean).join("\n\n") || null,
+        hypothesis: parsed.hypothesis?.trim() || null,
+        methods: parsed.methods?.trim() || null,
         tags: tagArr,
         entry_date: new Date().toISOString().split("T")[0],
-        measurements: null,
+        measurements: [],
         user_id: "local",
       });
       return entry;
