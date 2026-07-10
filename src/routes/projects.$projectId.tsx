@@ -5,8 +5,7 @@ import { ArrowLeft, Trash2, MoreVertical } from "lucide-react";
 import { AppHeader } from "@/components/journal/AppHeader";
 import { BottomNav } from "@/components/journal/BottomNav";
 import { NewEntryDialog } from "@/components/journal/NewEntryDialog";
-import { fetchProject, fetchEntries, colorClasses, STATUS_LABELS, PROJECT_STATUS_LABELS } from "@/lib/journal";
-import { supabase } from "@/integrations/supabase/client";
+import { fetchProject, fetchEntries, deleteProject, colorClasses, STATUS_LABELS, PROJECT_STATUS_LABELS } from "@/lib/journal";
 import { toast } from "sonner";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -27,8 +26,7 @@ function ProjectPage() {
 
   const del = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("projects").delete().eq("id", projectId);
-      if (error) throw error;
+      await deleteProject(projectId);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["projects"] });
