@@ -5,8 +5,7 @@ import { ArrowLeft, Trash2, Save, Plus, X } from "lucide-react";
 import { AppHeader } from "@/components/journal/AppHeader";
 import { BottomNav } from "@/components/journal/BottomNav";
 import { NewEntryDialog } from "@/components/journal/NewEntryDialog";
-import { fetchEntry, fetchProjects, STATUS_LABELS, type Measurement } from "@/lib/journal";
-import { supabase } from "@/integrations/supabase/client";
+import { fetchEntry, fetchProjects, updateEntry, deleteEntry, STATUS_LABELS, type Measurement } from "@/lib/journal";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -51,7 +50,7 @@ function EntryPage() {
 
   const save = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("entries").update({
+      await updateEntry(entryId, {
         title: form.title.trim().slice(0, 200) || "Untitled",
         status: form.status,
         entry_date: form.entry_date,
@@ -60,10 +59,9 @@ function EntryPage() {
         results: form.results.trim() || null,
         conclusion: form.conclusion.trim() || null,
         tags: form.tags,
-        measurements: form.measurements as unknown as never,
+        measurements: form.measurements,
         project_id: form.project_id === "none" ? null : form.project_id,
-      }).eq("id", entryId);
-      if (error) throw error;
+      });
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["entries"] });
@@ -75,8 +73,7 @@ function EntryPage() {
 
   const del = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("entries").delete().eq("id", entryId);
-      if (error) throw error;
+      await deleteEntry(entryId);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["entries"] });
